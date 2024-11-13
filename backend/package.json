@@ -1,0 +1,52 @@
+{
+    "name": "mytask",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "start": "ts-node src/server.ts",
+        "migration:run": "typeorm migration:run -d dist/config/dbconfig.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/node": "^22.7.4",
+        "bcrypt": "^5.1.1",
+        "bcryptjs": "^2.4.3",
+        "class-validator": "^0.14.1",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.21.1",
+        "firebase-admin": "^12.6.0",
+        "handlebars": "^4.7.8",
+        "joi": "^17.13.3",
+        "jsonwebtoken": "^9.0.2",
+        "mongodb": "^5.9.2",
+        "mongoose": "^8.7.0",
+        "node": "^20.18.0",
+        "node-cron": "^3.0.3",
+        "nodemailer": "^6.9.15",
+        "pdfkit": "^0.15.0",
+        "pg": "^8.13.0",
+        "puppeteer": "^23.5.3",
+        "reflect-metadata": "^0.2.2",
+        "socket.io": "^4.8.0",
+        "ts-node": "^10.9.2",
+        "typeorm": "^0.3.20",
+        "typescript": "^5.6.2",
+        "uuid": "^10.0.0",
+        "xlsx": "^0.18.5"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^5.0.2",
+        "@types/bcryptjs": "^2.4.6",
+        "@types/express": "^4.17.21",
+        "@types/handlebars": "^4.1.0",
+        "@types/jsonwebtoken": "^9.0.7",
+        "@types/node-cron": "^3.0.11",
+        "@types/nodemailer": "^6.4.16",
+        "@types/pdfkit": "^0.13.5",
+        "@types/uuid": "^10.0.0",
+        "ts-node-dev": "^2.0.0"
+    }
+}

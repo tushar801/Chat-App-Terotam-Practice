@@ -1,0 +1,111 @@
+/* Center the container in the viewport */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f4f8;
+    /* Light background color */
+}
+
+/* Styling the login card */
+.card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    /* Added padding for better spacing */
+    width: 400px;
+    /* Fixed width for the card */
+    transition: transform 0.3s;
+    /* Smooth scale effect */
+}
+
+/* Scale effect on hover */
+.card:hover {
+    transform: scale(1.02);
+    /* Slightly enlarge card on hover */
+}
+
+/* Header styles */
+.card h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+    font-size: 24px;
+    /* Increased font size */
+}
+
+/* Input field styles */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    /* Full width */
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    /* Space between inputs */
+    font-size: 16px;
+    /* Font size */
+    transition: border-color 0.3s;
+    /* Smooth border color transition */
+}
+
+/* Input focus effect */
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #007bff;
+    /* Change border color on focus */
+    outline: none;
+    /* Remove outline */
+}
+
+/* Button styles */
+button {
+    width: 100%;
+    /* Full width button */
+    padding: 12px;
+    background-color: #007bff;
+    /* Blue button color */
+    color: white;
+    /* Button text color */
+    border: none;
+    /* No border */
+    border-radius: 5px;
+    /* Rounded corners */
+    font-size: 16px;
+    /* Font size */
+    cursor: pointer;
+    /* Pointer on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    /* Transition effect */
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #0056b3;
+    /* Darker shade on hover */
+    transform: translateY(-2px);
+    /* Slight lift effect */
+}
+
+/* Error message styles */
+.error {
+    color: red;
+    /* Text color for error */
+    margin-top: 10px;
+    /* Space above error message */
+    font-size: 14px;
+    /* Font size for error message */
+    text-align: center;
+    /* Center the error message */
+    background-color: #ffcccc;
+    /* Light red background */
+    padding: 10px;
+    /* Padding around error message */
+    border-radius: 5px;
+    /* Rounded corners */
+    border: 1px solid red;
+    /* Border for visibility */
+}
