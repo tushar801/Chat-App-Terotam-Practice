@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
 export class CreateComplaintTable1647649200000 implements MigrationInterface {
-
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -27,9 +26,9 @@ export class CreateComplaintTable1647649200000 implements MigrationInterface {
             type: 'text',
           },
           {
-            name: 'priority',
-            type: 'int',
-            isNullable: true, 
+            name: 'trigger_time',
+            type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'date',
@@ -42,11 +41,16 @@ export class CreateComplaintTable1647649200000 implements MigrationInterface {
           {
             name: 'status',
             type: 'varchar',
-            default: `'Upcoming'`, 
+            default: `'Upcoming'`,
           },
           {
             name: 'complaint_userId',
             type: 'varchar',
+          },
+          {
+            name: 'form_fields_array',
+            type: 'jsonb',  // Adding the jsonb type for dynamic form fields
+            isNullable: true,
           },
         ],
       })

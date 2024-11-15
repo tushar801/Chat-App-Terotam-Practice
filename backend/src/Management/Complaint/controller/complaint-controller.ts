@@ -2,55 +2,66 @@ import { Request, Response } from 'express';
 import { ComplaintService } from '../services/complaint-service';
 
 export class ComplaintController {
-  private complaintService: ComplaintService;
-
-  constructor() {
-    this.complaintService = new ComplaintService();
+  // Create Complaint
+  static async createComplaint(req: Request, res: Response) {
+    try {
+      const { title, complaintType, description, complaint_userId,  form_fields_array } = req.body;
+      
+      // Ensure the complaint data is correct and create a new complaint
+      const complaint = await ComplaintService.createComplaint({ title, complaintType, description, complaint_userId,  form_fields_array });
+      
+      if (!complaint) {
+        return res.status(400).json({ error: 'Failed to create complaint' });
+      }
+      
+      return res.status(201).json({ message: 'Complaint created successfully', data: complaint });
+    } catch (error: any) {
+      console.error('Error creating complaint:', error);
+      return res.status(500).json({ error: error.message || 'Something went wrong while creating the complaint.' });
+    }
   }
 
-  // POST route for creating a complaint
-  createComplaint = async (req: Request, res: Response) => {
-    const { title, complaintType, description, priority, date, time, complaint_userId } = req.body;
-    try {
-      const result = await this.complaintService.createComplaint({
-        title,
-        complaintType,
-        description,
-        priority,
-        date,
-        time,
-        complaint_userId,
-      });
-      res.status(201).json(result);
-    } catch (error: any) {
-      res.status(400).json({ error: error.message });
-    }
-  };
-
-  // PUT route for updating complaint fields (title, complaintType, description)
-  updateComplaint = async (req: Request, res: Response) => {
+  // Update Complaint
+  static async updateComplaint(req: Request, res: Response) {
     const { id } = req.params;
-    const { title, complaintType, description } = req.body; // Ensure required fields are passed
+    const { title, complaintType, description,  form_fields_array } = req.body;
+
+    // Ensure the ID is parsed as a number
+    const complaintId = parseInt(id);
+    if (isNaN(complaintId)) {
+      return res.status(400).json({ error: 'Invalid complaint ID' });
+    }
+
     try {
-      const result = await this.complaintService.updateComplaint(parseInt(id), {
+      const updatedComplaint = await ComplaintService.updateComplaint(complaintId, {
         title,
         complaintType,
         description,
+         form_fields_array
       });
-      res.status(200).json(result);
+      res.status(200).json(updatedComplaint);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
-  };
+  }
 
-  // GET route for filtering complaints
-   async getFilteredComplaintList(req: Request, res: Response): Promise<void> {
+  // Filter and Search Complaints
+  static async getFilteredComplaintList(req: Request, res: Response) {
     try {
-      const complaints = await this.complaintService.getFilteredComplaintList(req.body);
+      const { status, title, complaint_type, searchTerm } = req.body;
+
+      const filterParams = {
+        status: status ? status : undefined,
+        title: title ? title : undefined,
+        complaint_type: complaint_type ? complaint_type : undefined,
+        searchTerm: searchTerm ? searchTerm : undefined,
+      };
+
+      const complaints = await ComplaintService.getFilteredComplaints(filterParams);
+
       res.status(200).json(complaints);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   }
 }
-

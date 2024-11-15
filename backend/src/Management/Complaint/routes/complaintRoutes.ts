@@ -3,47 +3,52 @@ import { ComplaintService } from '../services/complaint-service';
 import { ComplaintController } from '../controller/complaint-controller';
 
 const router = Router();
-const complaintService = new ComplaintService();
-const complaintController = new ComplaintController();
 
 // Create Complaint
 router.post('/complaint', async (req, res) => {
   try {
-    const complaint = await complaintService.createComplaint(req.body);
-    res.status(201).json(complaint);
+    const complaint = await ComplaintController.createComplaint(req, res);
+    if (!complaint) {
+      return res.status(400).json({ error: 'Failed to create complaint' });
+    }
+    res.status(201).json({ message: 'Complaint created successfully', data: complaint });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Error creating complaint:', error);
+    res.status(500).json({ error: error.message || 'Something went wrong while creating the complaint.' });
   }
 });
 
 // Update Complaint (title, complaintType, description)
-// Update Complaint (title, complaintType, description)
 router.post('/complaint/:id', async (req, res) => {
   const { id } = req.params;
-  const { title, complaintType, description} = req.body;
+  const { title, complaintType, description, formField } = req.body;
 
-  // Ensure the ID is parsed as a number
   const complaintId = parseInt(id);
   if (isNaN(complaintId)) {
     return res.status(400).json({ error: 'Invalid complaint ID' });
   }
 
   try {
-    // Update complaint fields like title, complaintType, description
-    const updatedComplaint = await complaintService.updateComplaint(complaintId, {
-      title,
-      complaintType,
-      description,
-    });
-    res.status(200).json(updatedComplaint);
+    const updatedComplaint = await ComplaintController.updateComplaint(req, res);
+    if (!updatedComplaint) {
+      return res.status(404).json({ error: 'Complaint not found or update failed' });
+    }
+    res.status(200).json({ message: 'Complaint updated successfully', data: updatedComplaint });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Error updating complaint:', error);
+    res.status(500).json({ error: error.message || 'Something went wrong while updating the complaint.' });
   }
 });
 
-
-// Filter/Search Complaints
-router.get('/complaints/filter', complaintController.getFilteredComplaintList);
+// Filter and Search Complaints
+router.post('/complaints/filter', async (req, res) => {
+  try {
+    const complaints = await ComplaintController.getFilteredComplaintList(req, res);
+    res.status(200).json({ message: 'Complaints fetched successfully', data: complaints });
+  } catch (error: any) {
+    console.error('Error fetching filtered complaints:', error);
+    res.status(500).json({ error: error.message || 'Something went wrong while fetching the complaints.' });
+  }
+});
 
 export default router;
-

@@ -1,114 +1,73 @@
+// Service to handle complaint-related logic
 import { AppDataSource } from '../../../config/dbconfig';
 import { Complaint } from '../entities/Complaint';
-import { ComplaintHistory } from '../entities/ComplaintHistory';
-import { logAction } from '../controller/logger';
+import { Like, Repository } from 'typeorm';
 
 export class ComplaintService {
-  // Create new complaint and add initial history with logging
-  async createComplaint(data: {
-    title: string;
-    complaintType: string;
-    description: string;
-    priority: number;
-    date: string;
-    time: string;
-    complaint_userId: string;
-  }) {
-    const complaintRepository = AppDataSource.getRepository(Complaint);
-    const historyRepository = AppDataSource.getRepository(ComplaintHistory);
-
-    return await AppDataSource.transaction(async (transactionalEntityManager) => {
-      const newComplaint = complaintRepository.create({
-        ...data,
-        complaint_userId: data.complaint_userId,
-        status: 'Upcoming', // Default status on creation
-      });
-      const savedComplaint = await transactionalEntityManager.save(newComplaint);
-
-      const complaintHistory = historyRepository.create({
-        complaint: savedComplaint,
-        title: 'Initial complaint state',
-        status: savedComplaint.status,
-        complaint_userId: data.complaint_userId,
-      });
-
-      await transactionalEntityManager.save(complaintHistory);
-      await logAction('Create', savedComplaint.id, 'Complaint created with initial status "Upcoming"');
-
-      return savedComplaint;
-    });
+  // Create Complaint
+  static async createComplaint(complaintData: any) {
+    try {
+      const complaintRepo = AppDataSource.manager.getRepository(Complaint);
+      const complaint = complaintRepo.create(complaintData);
+      await complaintRepo.save(complaint);
+      return complaint;
+    } catch (error) {
+      console.error('Error creating complaint:', error);
+      throw new Error('Failed to create complaint');
+    }
   }
 
-  // Update complaint fields (title, complaintType, description)
-  // Update complaint fields (title, complaintType, description)
-async updateComplaint(complaintId: number, updateData: {
-  title?: string;
-  complaintType?: string;
-  description?: string;
-}) {
-  const complaintRepository = AppDataSource.getRepository(Complaint);
-  const historyRepository = AppDataSource.getRepository(ComplaintHistory);
+  // Update Complaint (title, complaintType, description)
+  static async updateComplaint(complaintId: number, updatedData: any) {
+    try {
+      const complaintRepo = AppDataSource.manager.getRepository(Complaint);
+      const complaint = await complaintRepo.findOneBy({ id: complaintId });
+      if (!complaint) {
+        throw new Error('Complaint not found');
+      }
+      Object.assign(complaint, updatedData);  // Merge the updated fields into the complaint
+      await complaintRepo.save(complaint);
+      return complaint;
+    } catch (error) {
+      console.error('Error updating complaint:', error);
+      throw new Error('Failed to update complaint');
+    }
+  }
 
-  return await AppDataSource.transaction(async (transactionalEntityManager) => {
-    // Ensure that the ID is valid
-    if (isNaN(complaintId)) {
-      throw new Error('Invalid complaint ID');
+  // Filter and Search Complaints including dynamic fields in formField array
+  static async getFilteredComplaints(filterParams: any) {
+    const { status, title, complaint_type, searchTerm } = filterParams;
+
+    // Create the conditions for the WHERE clause dynamically
+    const whereConditions: any = {};
+
+    if (status) {
+      whereConditions.status = status;  // Filter by status
+    }
+    if (title) {
+      whereConditions.title = Like(`%${title}%`);  // Filter by title
+    }
+    if (complaint_type) {
+      whereConditions.complaint_type = Like(`%${complaint_type}%`);  // Filter by complaint_type
     }
 
-    const complaint = await transactionalEntityManager.findOne(Complaint, { where: { id: complaintId } });
-    if (!complaint) {
-      throw new Error(`Complaint with ID ${complaintId} not found`);
+    // If searchTerm is provided, search across title, complaint_type and dynamic form fields
+    if (searchTerm) {
+      whereConditions.title = Like(`%${searchTerm}%`);
+      whereConditions.complaint_type = Like(`%${searchTerm}%`);
+
+      // Check dynamic fields within formField array
+      whereConditions. form_fields_array = Like(`%${searchTerm}%`); // Match against dynamic fields in formField array
     }
-
-    if (updateData.title) complaint.title = updateData.title;
-    if (updateData.complaintType) complaint.complaintType = updateData.complaintType;
-    if (updateData.description) complaint.description = updateData.description;
-
-    await transactionalEntityManager.save(complaint);
-
-    const complaintHistory = historyRepository.create({
-      complaint: complaint,
-      title: 'Complaint updated',
-      status: complaint.status, // Keep the same status
-      complaint_userId: complaint.complaint_userId,
-    });
-
-    await transactionalEntityManager.save(complaintHistory);
-    await logAction('Update', complaintId, 'Complaint updated with new title, complaint type, or description');
-
-    return complaint;
-  });
-}
-
-  // Filter and Search complaints based on title, complaintType, and status (POST request)
-  async getFilteredComplaintList(query: { title?: string; complaintType?: string; status?: string }) {
-    const complaintRepository = AppDataSource.getRepository(Complaint);
-
-    const where: any = {};
-
-    // Add filters to the query condition if provided
-    if (query.title) {
-      where.title = { $ilike: `%${query.title}%` }; // Case-insensitive search for title
-    }
-    if (query.complaintType) {
-      where.complaintType = { $ilike: `%${query.complaintType}%` }; // Case-insensitive search for complaintType
-    }
-    if (query.status) {
-      where.status = query.status; // Exact match for status
-    }
-
-    console.log('Query where condition:', where); // Log query to check correctness
 
     try {
-      // Fetch complaints based on the filters
-      const complaints = await complaintRepository.find({
-        where,
+      const complaintRepo = AppDataSource.manager.getRepository(Complaint);
+      const complaints = await complaintRepo.find({
+        where: whereConditions,
       });
-
-
       return complaints;
     } catch (error) {
-      console.error('Error fetching complaints:', error);
+      console.error('Error fetching filtered complaints:', error);
       throw new Error('Failed to fetch complaints');
     }
   }

@@ -15,8 +15,8 @@ export class Complaint {
   @Column('text')
   description: string;
 
-  @Column({ type: 'int', nullable: true })
-  priority: number | null;
+  @Column({ type: 'varchar', nullable: true })
+  trigger_time: string | null;
 
   @Column()
   date: string;
@@ -29,6 +29,10 @@ export class Complaint {
 
   @Column()
   complaint_userId: string;
+
+  // Adding dynamic form fields array to store form data
+  @Column('jsonb', { nullable: true })
+  form_fields_array: { type: number; u_id: number; field_name: string }[];
 
   // One Complaint can have many ComplaintHistory records
   @OneToMany(() => ComplaintHistory, (history) => history.complaint)

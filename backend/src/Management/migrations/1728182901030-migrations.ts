@@ -5,7 +5,7 @@ export class Migrations1728182901030 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
-            `INSERT INTO "user"(name, email, mobile, "uniqueId", password) VALUES ('Shyamlaal', 'shyamlaal@gmail.com', '537497988449', 'SH0004', 'passwordshyams')`
+            `INSERT INTO "user"(name, email, mobile, "uniqueId", password) VALUES ('shiva', 'shiva@gmail.com', '5374397988449', 'SH0006', 'passwordshyamse')`
         );
     }
 

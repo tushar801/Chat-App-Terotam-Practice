@@ -12,8 +12,8 @@ export class ComplaintHistory {
 
   @Column()
   title: string;
-    
- @Column()
+
+  @Column()
   status: string;
 
   @Column({ name: 'complaint_userId' })
